@@ -1,6 +1,7 @@
 #include <chrono>
 #include <thread>
 #include <iostream>
+#include <functional>
 
 // Библиотека std::crono предназначена для работы со временем и таймерами. Она реализует следующие концепции: интервалы времени - duration,
 // моменты времени - time_point, таймеры - clock.
@@ -114,6 +115,28 @@ void foo(std::chrono::minutes) {};
 
 using namespace std::chrono_literals;
 
+class Benchmark
+{
+	public:
+    template <typename Func, typename... Args>
+    static void MeasureExecutionTime(Func func, Args&&... args) {
+        auto start = std::chrono::high_resolution_clock::now();
+        
+        func(std::forward<Args>(args)...);
+        
+        auto end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> duration = end - start;
+        
+        std::cout << "Время выполнения: " << duration.count() << " секунд" << std::endl;
+    }
+};
+
+void test_func(int a, double b)
+{
+	auto res = a + b;
+	std::this_thread::sleep_for(5s);
+}
+
 int main()
 {
 	std::cout << "Ratio:" << std::endl;
@@ -195,16 +218,19 @@ int main()
 	auto start = std::chrono::steady_clock::now();
 	
 	std::this_thread::sleep_for(std::chrono::seconds(2));
+	// можно еще так std::this_thread::sleep_for(2000ms);
 
 	auto end = std::chrono::steady_clock::now();
 	auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
-	if (elapsed > std::chrono::seconds(3))
+	if (elapsed < std::chrono::seconds(3))
 	{
 		std::cout << "Elapsed less than a 3 second" << std::endl;
 	}
 
 	std::cout << "Elapsed time in ms: " << start.time_since_epoch().count() << ' ' << end.time_since_epoch().count() << ' ' << elapsed.count() << std::endl;
+
+	Benchmark::MeasureExecutionTime(test_func, 5, 5.0);
 
 	return 0;
 }
