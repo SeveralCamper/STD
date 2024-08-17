@@ -127,7 +127,7 @@ class Benchmark
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> duration = end - start;
         
-        std::cout << "Время выполнения: " << duration.count() << " секунд" << std::endl;
+        std::cout << "Execution time: " << duration.count() << " seconds" << std::endl;
     }
 };
 
