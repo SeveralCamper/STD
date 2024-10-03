@@ -9,8 +9,8 @@
 // Начнем с std::ratio, это шаблонный класс, реализующий compile-time обыкновенную дробь (m/n). Не является частью библиотеки, но активно ей используется.
 
 /* template<
-    std::intmax_t Num,       //Числитель
-    std::intmax_t Denom = 1  //Знаменатель
+	std::intmax_t Num,       //Числитель
+	std::intmax_t Denom = 1  //Знаменатель
 > class ratio; */
 
 // Оба параметра класса имеют спецификатор constexpr, который обозначает константность и позволяет формировать тип на этапе компиляции.
@@ -24,19 +24,19 @@ using Metre = std::ratio<1000, 1>;
 template<class _Ratio>
 class Length
 {
-    double length_;
+	double length_;
 public:
-    explicit Length(double length) : length_(length) { }
-    double length() const { return length_; }
+	explicit Length(double length) : length_(length) { }
+	double length() const { return length_; }
 };
 
 template<class _Ratio1, class _Ratio2>
 Length<Mm> operator+(const Length<_Ratio1> &left, const Length<_Ratio2> &right)
 {
-    double len =
-        left.length() / _Ratio1::den * _Ratio1::num +
-        right.length() / _Ratio2::den * _Ratio2::num;
-    return Length<Mm>((int)len);
+	double len =
+		left.length() / _Ratio1::den * _Ratio1::num +
+		right.length() / _Ratio2::den * _Ratio2::num;
+	return Length<Mm>((int)len);
 }
 
 // duration — интервал времени
@@ -65,7 +65,7 @@ Length<Mm> operator+(const Length<_Ratio1> &left, const Length<_Ratio2> &right)
 using Hourglass = std::chrono::duration<long, std::ratio<180>>;
 // или можно определить тип с помощью std::ratio_multiply(класс R1, класс R2), который возвращает результат перемножения двух точных рациональных дробей.
 using Hourglass =
-  std::chrono::duration<long, std::ratio_multiply<std::ratio<3>, std::chrono::minutes::period>>;
+std::chrono::duration<long, std::ratio_multiply<std::ratio<3>, std::chrono::minutes::period>>;
 
 // Другие примеры:
 using MyTimeUnit = std::chrono::duration<long, std::ratio<11, 4>>;
@@ -118,17 +118,17 @@ using namespace std::chrono_literals;
 class Benchmark
 {
 	public:
-    template <typename Func, typename... Args>
-    static void MeasureExecutionTime(Func func, Args&&... args) {
-        auto start = std::chrono::high_resolution_clock::now();
-        
-        func(std::forward<Args>(args)...);
-        
-        auto end = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<double> duration = end - start;
-        
-        std::cout << "Execution time: " << duration.count() << " seconds" << std::endl;
-    }
+	template <typename Func, typename... Args>
+	static void MeasureExecutionTime(Func func, Args&&... args) {
+		auto start = std::chrono::high_resolution_clock::now();
+		
+		func(std::forward<Args>(args)...);
+		
+		auto end = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<double> duration = end - start;
+		
+		std::cout << "Execution time: " << duration.count() << " seconds" << std::endl;
+	}
 };
 
 void test_func(int a, double b)

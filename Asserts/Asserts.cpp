@@ -29,40 +29,40 @@ class ProcessV
 
 template<typename T>
 void process(T value) {
-    static_assert(std::is_integral<T>::value, "T must be an integral type");
-    // Функция выполняется только для целочисленных типов, таким образом можно сделать множество проверок доя шаблонных классов.
-    std::cout << "Processing integer: " << value << std::endl;
+	static_assert(std::is_integral<T>::value, "T must be an integral type");
+	// Функция выполняется только для целочисленных типов, таким образом можно сделать множество проверок доя шаблонных классов.
+	std::cout << "Processing integer: " << value << std::endl;
 }
 
 
 template<typename T>
 void processClass(T value) {
-    static_assert(std::is_default_constructible<T>::value, "T must be an default_constractable type");
+	static_assert(std::is_default_constructible<T>::value, "T must be an default_constractable type");
 	static_assert(std::is_destructible<T>::value, "T must be an default_destructable type");
-    std::cout << "Processing Class: " << value << std::endl;
+	std::cout << "Processing Class: " << value << std::endl;
 }
 
 
 template<typename T>
 void processClassV(T value) {
-    static_assert(std::is_default_constructible_v<T>);
+	static_assert(std::is_default_constructible_v<T>);
 	static_assert(std::is_nothrow_destructible<T>::value, "T must be an is_nothrow_destructible type");
-    std::cout << "Processing ClassV: " << value << std::endl;
+	std::cout << "Processing ClassV: " << value << std::endl;
 }
 
 
 void divide(int a, int b) {
-    assert(b != 0);
-    std::cout << "Result: " << (a / b) << std::endl;
+	assert(b != 0);
+	std::cout << "Result: " << (a / b) << std::endl;
 }
 
 
 int main() {
-    process(42);
-    // process(10.01); // Ошибка компиляции
-    divide(10, 2);
-    // divide(10, 0);  // Приведёт к завершению программы
+	process(42);
+	// process(10.01); // Ошибка компиляции
+	divide(10, 2);
+	// divide(10, 0);  // Приведёт к завершению программы
 	processClass(new Process);
 	processClassV(new ProcessV);
-    return 0;
+	return 0;
 }

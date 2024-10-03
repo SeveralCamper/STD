@@ -7,6 +7,13 @@
 // Доступ до элементов осуществляется с помощью  std::get<index>(tuple) - возвращает неизменяемый элемент с индексом index из кортежа. Также распаковать данные из
 // кортежа можно с помощью std::tie(...), передав туда все переменные, в которые надо будет распокавать кортеж.
 
+class Test
+{
+public:
+	Test() {};
+	~Test() = delete;
+};
+
 template<typename... Args>
 class TupleHolder
 {
@@ -77,6 +84,9 @@ int main() {
 	using ElementType0 = std::tuple_element<0, decltype(myTuple2)>::type; // Получение типа первого элемента (int)
 	using ElementType1 = std::tuple_element<1, decltype(myTuple2)>::type; // Получение типа второго элемента (double)
 	using ElementType2 = std::tuple_element<2, decltype(myTuple2)>::type; // Получение типа третьего элемента (const char*)
+
+	Test* obj = new Test();
+	TupleHolder<int, double, Test> Holder2(10, 20.5, &obj); // нельзя создать экземпляр класса, т.к. деструктор удален - ошибка компиляции
 
     return 0;
 }
