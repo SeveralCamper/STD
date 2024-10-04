@@ -312,7 +312,7 @@ int main()
 	for (size_t i = 0; i < sizeof(value2); ++i) {
 		std::cout << std::hex << static_cast<int>(bytePtrRC[i]) << " ";
 	}
-	std::cout << std::endl << std::endl;
+	std::cout << std::dec << std::endl << std::endl;
 
 	// А reinterpret_cast поддерживает cross-cast
 
@@ -327,6 +327,20 @@ int main()
 	{
 	 	std::cout << "Failed to cast to DynamicChildVirtual2" << std::endl;
 	}
+
+	// const_cast<> - удаляет квалификаторы const и volotile
+
+    const int valueConst = 10;
+    const int* constPtr = &valueConst;
+
+	std::cout << "Value: " << valueConst << std::endl;
+    int* modifiablePtr = const_cast<int*>(constPtr);
+    *modifiablePtr = 20;
+
+    std::cout << "Value: " << valueConst << std::endl; // может вызвать сбои в программе, т.к. константные данные могут распологаться в сегменте постоянных данных
+													   // также компилятор может хранить эту переменную в каком-нибудь регистре уже думаю, что она 10 и поменять ее также будет невозможно
+
+	// С-stle cast - не использовать :) В зависимости от типа преобразования использует либо static_cast, либо reinterpret_cast, либо const_cast
 
 	return 0;
 }
