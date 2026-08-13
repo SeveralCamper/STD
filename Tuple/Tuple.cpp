@@ -1,9 +1,10 @@
 #include <tuple>
+#include <vector>
 #include <iostream>
 
 // std::tuple - это контейнер, который позволяет хранить набор элементов разных типов данных - кортеж. Типы элементов std::tuple известны во время компиляции, что
 // дает возможность использовать шаблоны для std::tuple. Прямой возможности итерирования по контейнеру нет, но можно использовать развертывание кортежа std::apply
-// таким образом передав в std::aply параметры кортежа, !можно взаимодействовать с каждым из них как с отдельной переменной!.
+// таким образом передав в std::apply параметры кортежа, можно удобно передавать значения кортежа в методы и функции.
 // Доступ до элементов осуществляется с помощью  std::get<index>(tuple) - возвращает неизменяемый элемент с индексом index из кортежа. Также распаковать данные из
 // кортежа можно с помощью std::tie(...), передав туда все переменные, в которые надо будет распокавать кортеж.
 
@@ -18,21 +19,21 @@ template<typename... Args>
 class TupleHolder
 {
 public:
-    TupleHolder(const Args&... args) : data(std::make_tuple(args...)) {}
+	TupleHolder(const Args&... args) : data(std::make_tuple(args...)) {}
 
-    void Print() const
-    {
-        std::apply([](const auto&... args)
-        {
-            ((std::cout << args << ' '), ...); // fold-выражения - позволяет применять бинарную операцию к параметрам, переданным в качестве аргумента лямбды или др. функции
-        }, data);
-    }
+	void Print() const
+	{
+		std::apply([](const auto&... args)
+		{
+			((std::cout << args << ' '), ...); // fold-выражения - позволяет применять бинарную операцию к параметрам, переданным в качестве аргумента лямбды или др. функции
+		}, data);
+	}
 
-    template<std::size_t Index>
-    auto GetElement() const
-    {
-        return std::get<Index>(data);
-    }
+	template<std::size_t Index>
+	auto GetElement() const
+	{
+		return std::get<Index>(data);
+	}
 
 	std::tuple<Args...> GetData()
 	{
@@ -40,31 +41,34 @@ public:
 	}
 
 private:
-    std::tuple<Args...> data;
+	std::tuple<Args...> data;
 };
 
 int main() {
-    int a;
-    double b;
-    std::string c;
-    TupleHolder<int, double, const char*> Holder(10, 20.5, "Hello");
-    Holder.Print();
+	int a = 0;
+	double b = 0;
+	std::string c = "";
+	TupleHolder<int, double, const char*> Holder(10, 20.5, "Hello");
+	Holder.Print();
 
 	std::cout << std::endl;
 	std::cout << "GetElemnt: " << std::endl;
-    auto myTuple = std::make_tuple(10, 10.01, "Hello");
+	auto myTuple = std::make_tuple(10, 10.01, "Hello");
 	std::tie(a, b, c) = myTuple;
-    std::cout << Holder.GetElement<0>() << std::endl;
+	std::cout << Holder.GetElement<0>() << std::endl;
 	std::cout << Holder.GetElement<1>() << std::endl;
 	std::cout << Holder.GetElement<2>() << std::endl;
-    std::cout << a << ' ' << b << ' ' << c << std::endl;
+	std::cout << a << ' ' << b << ' ' << c << std::endl;
 	a = 15;
 	b = 20.02;
 	c = "Olleh";
+	std::cout << std::endl;
 
 	std::cout << std::get<0>(myTuple) << " ";
 	std::cout << std::get<1>(myTuple) << " ";
 	std::cout << std::get<2>(myTuple) << std::endl; // итерироваться с использование std::get<index>() нельзя, т.к. std::get необходим сатический индекс, чтобы знать его на этапе компиляции
+
+	std::cout << std::endl;
 
 	std::cout << a << " " << b << " " << c << std::endl;
 
@@ -85,8 +89,33 @@ int main() {
 	using ElementType1 = std::tuple_element<1, decltype(myTuple2)>::type; // Получение типа второго элемента (double)
 	using ElementType2 = std::tuple_element<2, decltype(myTuple2)>::type; // Получение типа третьего элемента (const char*)
 
-	Test* obj = new Test();
-	TupleHolder<int, double, Test> Holder2(10, 20.5, &obj); // нельзя создать экземпляр класса, т.к. деструктор удален - ошибка компиляции
+	// Test* obj = new Test();
+	// TupleHolder<int, double, Test> Holder2(10, 20.5, *obj); // нельзя создать экземпляр класса, т.к. деструктор удален - ошибка компиляции
 
-    return 0;
+	std::tuple<std::vector<int>, std::string> tuple({1, 2, 3}, "example");
+
+	// Получаем доступ к вектору
+	std::vector<int>& myVector = std::get<0>(tuple);
+	std::string& new_str = std::get<1>(tuple);
+
+	// Изменяем элементы вектора
+	myVector[0] = 10;
+	myVector.push_back(4);
+
+	new_str = "new_example";
+
+	std::vector<int>& myVector2 = std::get<0>(tuple);
+	for(auto& it : myVector2)
+	{
+		std::cout << it << std::endl;
+	}
+
+	std::cout << std::get<1>(tuple) << std::endl;
+
+	std::tuple<int, int, int> t{1, 2, 3};
+	int& g = std::get<1>(t);
+	g = 3;
+	std::cout << std::get<1>(t) << std::endl;
+
+	return 0;
 }

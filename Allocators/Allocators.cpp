@@ -3,8 +3,6 @@
 #include <memory>
 #include <vector>
 
-// Общая структура памяти
-
 // Общая структура памяти:
 
 // Текстовый сегмент (.text):
@@ -73,6 +71,46 @@ class Test3 : public Test2
 		int member = 0;
 };
 
+
+class VirtualBase
+{
+	public:
+		VirtualBase() { std::cout << "Construct VirtualBase" << std::endl; }
+		virtual ~VirtualBase() { std::cout << "Distruct VirtualBase" << std::endl; }
+};
+
+
+class Virtual : public VirtualBase
+{
+	public:
+		Virtual() { std::cout << "Construct Virtual" << std::endl; }
+		~Virtual() { std::cout << "Distruct Virtual" << std::endl; }
+};
+
+
+class UnvirtualBase
+{
+	public:
+		UnvirtualBase() { std::cout << "Construct UnvirtualBase" << std::endl; }
+		~UnvirtualBase() { std::cout << "Distruct UnvirtualBase" << std::endl; }
+};
+
+
+class Unvirtual : public UnvirtualBase
+{
+	public:
+		Unvirtual() { std::cout << "Construct Unvirtual" << std::endl; }
+		~Unvirtual() { std::cout << "Distruct Unvirtual" << std::endl; }
+};
+
+
+void foo(const int* a)
+{
+    int* modifiable = const_cast<int*>(a);
+    *modifiable = 5;
+	std::cout << *a << std::endl;
+}
+
 int main()
 {
 	// malloc - mem allocation - функция выделения памяти, которая возвращает нам выделенную область памяти, равную размеру * на размер типа, либо NULL
@@ -106,6 +144,8 @@ int main()
 	Test* t = new Test();
 	delete t;
 
+	// new[] выделяет память для нескольких объектов
+
 	Test* testArr;
 	testArr = new Test[5];
 
@@ -118,6 +158,9 @@ int main()
 	// Когда объект больше не нужен, нужно явно вызвать деструктор, так как при вызове operator delete конструктор вызван не будет
 	obj->~Test();
 	operator delete(buffer);
+
+	int a[10];
+	int* ptr = new (a) int[10]; //использован placement new
 
 	// Если new не может выделить память, он выбрасывает исключение:
 	try
@@ -145,6 +188,23 @@ int main()
 
 	obj3->~Test3();
 	operator delete(buffer3);
+
+	// Test* testArr2;
+	// testArr2 = new Test[]; // нельзя скомпилировать не указав размер
+
+	const int abc = 10;
+	const int* pValue = &abc;
+	foo(pValue);
+
+	// Немного о связывании и важности виртуального деструктора
+
+	UnvirtualBase* pUB = new Unvirtual(); // Если мы выделим память в базовый класс с типом класса наследника, а потом вызовем оператор delete. То мы получим
+	delete pUB; // утечку памяти, т.к. будет вызван только деструктор базового класса. Чтобы решить эту проблему, нужно использовать вирутальный деструктор
+
+	VirtualBase* pVB = new Virtual(); // Данная проблема происходит из-за того, что без использования виртуального деструктора метод, вызываемый при delete
+	delete pVB; // определяется на этапе компиляции - раннее связывание. Если же мы определим дестуктоор как виртуальный, то тип уже будет определяться
+	// в runTime, с помощью таблицы виртулаьный фукнций. Там компилятор определит, что в нашем случае, для данного delete нужно вызвать деструктор класса
+	// наследника, который после своей работы вызовет и деструктор базового класса
 
 	return 0;
 }

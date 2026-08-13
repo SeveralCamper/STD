@@ -14,8 +14,8 @@
 class Process
 {
 	public:
-	Process() { std::cout << "Here i'am" << std::endl; }
-	~Process() { std::cout << "I'am die :c" << std::endl; }
+		Process() { std::cout << "Here i'am" << std::endl; }
+		~Process() { std::cout << "I'am die :c" << std::endl; }
 };
 
 
